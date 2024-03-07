@@ -4,7 +4,7 @@ import time
 import threading
 import keyboard
 import numpy as np
-from pynput.keyboard import Key, Listener
+
 import mediapipe as mp
 from keras.models import load_model
 
