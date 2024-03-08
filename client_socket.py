@@ -4,8 +4,10 @@ import time
 
 
 class Client:
-    HOST = "101.46.143.21"  
-    LOCALHOST = "127.0.0.1"
+    
+    # HOST = "101.46.143.21"
+    HOST = "192.168.2.126"  
+    # LOCALHOST = "127.0.0.1"
     # HOST = "127.0.0.1"  
     PORT_SEND = 65432  
     PORT_RECEIVED = 65431  
@@ -17,6 +19,7 @@ class Client:
     def send(self, data): 
         print(f"sending...{len(data)}")   
         self.s_out.sendall(data)
+        time.sleep(1/4)
       
         
 

@@ -34,8 +34,9 @@ class VideoCap:
         while True:
             _, frame = cap.read()            
             frame = cv2.flip(frame,1 )
-            framergb = cv2.cvtColor(frame,cv2.IMREAD_COLOR)
+            # framergb = cv2.cvtColor(frame,cv2.IMREAD_COLOR)
             # framergb = cv2.cvtColor(frame)
+            framergb = frame
             cv2.imshow("Source", framergb)
             ret,encoded_frame = cv2.imencode(".jpg",framergb,[int(cv2.IMWRITE_JPEG_QUALITY),24])
             buffer = pickle.dumps(encoded_frame)            
