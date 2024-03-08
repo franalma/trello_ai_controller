@@ -5,9 +5,9 @@ import time
 
 class Client:
     
-    # HOST = "101.46.143.21"
+    HOST = "101.46.143.21"
     # HOST = "192.168.2.126"  
-    HOST = "192.168.2.31"  
+    # HOST = "192.168.2.31"  
     # LOCALHOST = "127.0.0.1"
     # HOST = "127.0.0.1"  
     PORT_SEND = 65432  
@@ -19,13 +19,10 @@ class Client:
     s_in = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)          
 
         
-    def send(self, data): 
-        # print(f"sending...{len(data)}")   
+    def send(self, data):     
         self.s_out.sendall(data)
-        # time.sleep(1)
+        # time.sleep(1/2)
       
-        
-
     def receive(self):        
         self.s_in.bind((self.LOCALHOST, self.PORT_RECEIVED))
         self.s_in.listen()        

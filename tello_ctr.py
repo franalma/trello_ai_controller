@@ -118,6 +118,7 @@ while True:
                 print("THUMB DOWN")
     
     
+        
         cv2.imshow('Video from Tellol',framergb)
         if cv2.waitKey(5) & 0xFF == ord('q'):
             drone.streamoff()
