@@ -84,7 +84,7 @@ def manage():
         
 
 threadManage = threading.Thread(target=manage)
-# threadManage.start()
+threadManage.start()
         
 
 
@@ -95,30 +95,29 @@ while True:
         framergb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         
         
-        # result = hands.process(framergb)
+        result = hands.process(framergb)
     
-        # if result.multi_hand_landmarks: 
-        #     x,y,c = framergb.shape
-        #     landmarks = []
-        #     for handslms in result.multi_hand_landmarks:
-        #         for lm in handslms.landmark:
-        #             lmx = int (lm.x * x)
-        #             lmy = int (lm.y * y)
-        #             landmarks.append([lmx, lmy])
-        #         result.multi_hand_landmarks
-        #         mp_draw.draw_landmarks(framergb, handslms, mp_hands.HAND_CONNECTIONS)
-        #         # class_Name = labels[classID].capitalize()
+        if result.multi_hand_landmarks: 
+            x,y,c = framergb.shape
+            landmarks = []
+            for handslms in result.multi_hand_landmarks:
+                for lm in handslms.landmark:
+                    lmx = int (lm.x * x)
+                    lmy = int (lm.y * y)
+                    landmarks.append([lmx, lmy])
+                result.multi_hand_landmarks
+                mp_draw.draw_landmarks(framergb, handslms, mp_hands.HAND_CONNECTIONS)
+                # class_Name = labels[classID].capitalize()
         
-        #     prediction = model.predict([landmarks])
-        #     classID = np.argmax (prediction)        
-        #     print (classID)
-        #     if classID == 2: 
-        #         drone.move_back(40)
-        #     elif classID == 3:
-        #         print("THUMB DOWN")
+            prediction = model.predict([landmarks])
+            classID = np.argmax (prediction)        
+            print (classID)
+            if classID == 2: 
+                drone.move_back(40)
+            elif classID == 3:
+                print("THUMB DOWN")
     
     
-        print(frame)
         cv2.imshow('Video from Tellol',framergb)
         if cv2.waitKey(5) & 0xFF == ord('q'):
             drone.streamoff()

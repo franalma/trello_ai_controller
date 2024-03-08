@@ -11,7 +11,7 @@ class Server:
     def send_to_client_response(self, ip, port, cont): 
         try:    
             if self.isConnectedToClient == False:
-                client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)   
+                client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)   
                 client_socket.connect((ip, port))         
             
             client_socket.sendall(bytes("bye "+str(cont), "utf-8"))
@@ -20,18 +20,21 @@ class Server:
 
 
     def start (self, on_received):
-        s_in = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s_in = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s_in.bind((self.HOST, self.PORT))
-        s_in.listen()
+        # s_in.listen()
         print("Streaming server started...")
-        conn, addr = s_in.accept()
-        print(f"Connected by {addr[0]}") 
+        # conn, addr = s_in.accept()
+        
+        # print(f"Connected by {addr[0]}") 
         
         while True:
-            data = conn.recvfrom(1024)  
-            if data and len(data)>0: 
-                   
-                on_received(data)
+            buffer = s_in.recvfrom(1000000)  
+            on_received(buffer)
+            
+            
+            # if data and len(data)>0:                    
+            #     on_received(data)
                 
                 # print(data)
                 # time.sleep(2)

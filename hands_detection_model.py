@@ -8,10 +8,11 @@ class HandsDetection:
     mp_hands = mp.solutions.hands
     mp_draw:any
     model: any
+    hands: any
     
     
     def load_model(self):    
-        self.hands = self.mp_hands.Hands(static_image_mode = False, max_num_hands =1, min_detection_confidence = 0.7)
+        self.hands = self.mp_hands.Hands(static_image_mode = False, max_num_hands =2, min_detection_confidence = 0.7)
         self.mp_draw = mp.solutions.drawing_utils
         self.model = load_model("mp_hand_gesture")
     
