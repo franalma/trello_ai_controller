@@ -38,7 +38,7 @@ class VideoCap:
             # framergb = cv2.cvtColor(frame)
             framergb = frame
             cv2.imshow("Source", framergb)
-            ret,encoded_frame = cv2.imencode(".jpg",framergb,[int(cv2.IMWRITE_JPEG_QUALITY),24])
+            ret,encoded_frame = cv2.imencode(".jpg",framergb,[int(cv2.IMWRITE_JPEG_QUALITY),30])
             buffer = pickle.dumps(encoded_frame)            
             client.send(buffer)
             
