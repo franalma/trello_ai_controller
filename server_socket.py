@@ -1,44 +1,58 @@
 import socket
 import time
+import numpy as np
+from numpy.linalg import norm
+import pickle,struct
 
 class Server:
-    HOST = "127.0.0.1"  # Standard loopback interface address (localhost)
-    PORT = 65432  # Port to listen on (non-privileged ports are > 1023)
+    # HOST = "192.168.2.31" 
+    HOST = "0.0.0.0"
+    PORT = 65432  
     PORT_CLIENT = 65431
-    cont = 0 
+    s_in = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     isConnectedToClient = False 
+    prev_buffer =[]
+    isDisplayEnabled = False
     
-    def send_to_client_response(self, ip, port, cont): 
-        try:    
-            if self.isConnectedToClient == False:
-                client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)   
-                client_socket.connect((ip, port))         
-            
-            client_socket.sendall(bytes("bye "+str(cont), "utf-8"))
+    def send_to_client_response(self, ip, port, command): 
+        try:                            
+            # client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)                        
+            # client_socket.sendto(bytes(command),(ip, port))        
+            self.s_in.sendto(bytes(command,"utf-8"),(ip, port))
         except:
             return
 
+    
+    def calculate_frame_distance(self, data):
+        cosine = -1
+        slice_data = data[:30000]     
+    
+        if len(self.prev_buffer)> 0:                   
+            cosine = np.dot(self.prev_buffer,slice_data)/(norm(self.prev_buffer)*norm(slice_data))                
+            self.prev_buffer = slice_data   
+    
+            if cosine > 4.0e-07 : 
+                return True
+        return False
 
-    def start (self, on_received):
-        s_in = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s_in.bind((self.HOST, self.PORT))
-        # s_in.listen()
+    def start (self, on_received):        
+        self.s_in.bind((self.HOST, self.PORT))
+    
         print("Streaming server started...")
-        # conn, addr = s_in.accept()
         
-        # print(f"Connected by {addr[0]}") 
         
         while True:
-            buffer = s_in.recvfrom(1000000)  
-            on_received(buffer)
-            
-            
-            # if data and len(data)>0:                    
-            #     on_received(data)
+            buffer, addr = self.s_in.recvfrom(60000)  
+            data=pickle.loads(buffer)
+                       
+            if (len(data)>30000):               
+                # if self.calculate_frame_distance(data):
+                if True:
+                    result = on_received(data, self.isDisplayEnabled)                    
+                    if result >=0:
+                        print (result)
+                        self.send_to_client_response(addr[0], addr[1], str(result))
                 
-                # print(data)
-                # time.sleep(2)
-                # self.send_to_client_response(addr[0],self.PORT_CLIENT,self.cont)
                 
 
        
