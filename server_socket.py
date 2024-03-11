@@ -45,7 +45,7 @@ class Server:
             buffer, addr = self.s_in.recvfrom(60000)  
             data=pickle.loads(buffer)
                        
-            if (len(data)>30000):               
+            if (len(data)>16000):               
                 # if self.calculate_frame_distance(data):
                 if True:
                     result = on_received(data, self.isDisplayEnabled)                    
