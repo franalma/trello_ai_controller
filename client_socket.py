@@ -52,8 +52,8 @@ class Client:
     def receive2(self):                
         while True:
             data, _ = self.s_out.recvfrom(1024)
-            # if self.listener:
-            #     self.listener(data.decode("utf-8"))
+            if self.listener:
+                self.listener(data.decode("utf-8"))
             
     def start(self):        
         self.s_out.connect((self.HOST, self.PORT_SEND))            

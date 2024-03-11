@@ -8,8 +8,9 @@ from client_socket import Client
 
 
 class HCTrelloController:
+    isFying = False
     drone = tello.Tello()
-    
+    prev_command = ""
 
     def init(self):
         self.drone.connect()
@@ -74,12 +75,26 @@ class HCTrelloController:
                 continue
          
     def drone_listener(self,command):
-        print("command received: "+command)
-        # if (command =="2"):
-        #     self.drone.takeoff()
-        # elif (command == "3"  or command == "4"):
-        #     self.drone.land()
-        
+        try:
+            print("command received: "+command)
+            if (self.prev_command != command):
+                if (command =="2"):
+                    if (self.isFying == False):
+                        self.drone.takeoff()
+                        self.isFying = True
+                elif (command == "8"):
+                    if (self.isFying == True):
+                        self.drone.land()
+                        self.isFying = False
+                elif (command == "3"):
+                    if (self.isFying):
+                        self.drone.move_back(25)            
+                elif (command == "5"):
+                    if (self.isFying):
+                        self.drone.move_forward(25 ) 
+                self.prev_command = command                     
+        except:
+            return
    
               
     def start_stream(self):
@@ -87,18 +102,21 @@ class HCTrelloController:
         client = Client()
         client.start()
         while True:
-            frame = self.drone.get_frame_read().frame
-            frame = cv2.flip(frame,1 )
-            # framergb = cv2.cvtColor(frame,cv2.IMREAD_COLOR)
-            # framergb = cv2.cvtColor(frame)
-            framergb = frame
-            cv2.imshow("Drone video", framergb)
-            _,encoded_frame = cv2.imencode(".jpg",framergb,[int(cv2.IMWRITE_JPEG_QUALITY),30])
-            buffer = pickle.dumps(encoded_frame)            
-            client.send_with_listener(buffer,self.drone_listener)
-            
-            if cv2.waitKey(1) == ord('q'):
-                break 
+            try:
+                frame = self.drone.get_frame_read().frame
+                frame = cv2.flip(frame,1 )
+                # framergb = cv2.cvtColor(frame,cv2.IMREAD_COLOR)
+                # framergb = cv2.cvtColor(frame)
+                framergb = frame
+                cv2.imshow("Drone video", framergb)
+                _,encoded_frame = cv2.imencode(".jpg",framergb,[int(cv2.IMWRITE_JPEG_QUALITY),30])
+                buffer = pickle.dumps(encoded_frame)            
+                client.send_with_listener(buffer,self.drone_listener)
+                e
+                if cv2.waitKey(1) == ord('q'):
+                    break 
+            except:
+                continue
 
 
 controller = HCTrelloController()
