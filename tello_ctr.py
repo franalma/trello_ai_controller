@@ -1,128 +1,106 @@
 from djitellopy import tello
-import cv2
+import cv2, pickle
 import time
 import threading
 import keyboard
 import numpy as np
-
-import mediapipe as mp
-from keras.models import load_model
-
-mp_hands = mp.solutions.hands
-hands = mp_hands.Hands(static_image_mode = False, max_num_hands =1, min_detection_confidence = 0.7)
-mp_draw = mp.solutions.drawing_utils
-model = load_model("mp_hand_gesture")
+from client_socket import Client
 
 
-# import libh264decoder
+class HCTrelloController:
+    drone = tello.Tello()
+    
 
-drone = tello.Tello()
-startCounter = 1
-drone.connect()
-drone.streamoff()
-drone.streamon()
+    def init(self):
+        self.drone.connect()
+        self.drone.streamoff()
+        self.drone.streamon()
+        threadManage = threading.Thread(target=self.manage)
+        threadManage.start()
 
+    def fly_test(self):
+        print("Ready to fly")
+        battery = self.drone.get_battery()
+        print ("Battery level: "+str(battery))
+        try:        
+            time.sleep(5)
+            print ("taking off")
+            self.drone.takeoff()    
+            time.sleep(2)
+            self.drone.go_xyz_speed(0,0,0,10)
+            print("landing")
+            self.drone.land()
+            time.sleep(4)
+        finally:
+            print("emergency")
+            self.drone.emergency()
 
-def fly():
-    print("Ready to fly")
-    battery = drone.get_battery()
-    print ("Battery level: "+str(battery))
-    try:        
-        time.sleep(5)
-        print ("taking off")
-        drone.takeoff()    
-        time.sleep(2)
-        drone.go_xyz_speed(0,0,0,10)
-        print("landing")
-        drone.land()
-        time.sleep(4)
-    finally:
-        print("emergency")
-        drone.emergency()
+    def print_state(self):
+        state = self.drone.get_current_state()
+        print(state)
 
-def print_state():
-    state = drone.get_current_state()
-    print(state)
-
-def manage():
-    while True:
-        try:
-            key = keyboard.read_key()
-            print("key: "+key)
-            
-            if key=="t":
-                drone.takeoff()
-            elif key=="l":
-                drone.land()
-            elif key=="e":
-                drone.emergency()
-            elif key=="-":
-                drone.move_down(x=20)    
-            elif key=="+":
-                drone.move_up(x=20)
-            elif key=="up":
-                drone.move_forward(x=20)
-            elif key=="down":
-                drone.move_back(x=20)
-            elif key=="left":
-                drone.move_left(x=20)    
-            elif key=="right":    
-                drone.move_right(x=20)    
-            elif key == "a":
-                drone.set_speed(20)
-            elif key == "b":
-                battery = drone.get_battery()
-                print ("Battery level: "+str(battery))
+    def manage(self):
+        while True:
+            try:
+                key = keyboard.read_key()
+                print("key: "+key)
                 
+                if key=="t":
+                    self.drone.takeoff()
+                elif key=="l":
+                    self.drone.land()
+                elif key=="e":
+                    self.drone.emergency()
+                elif key=="-":
+                    self.drone.move_down(x=20)    
+                elif key=="+":
+                    self.drone.move_up(x=20)
+                elif key=="up":
+                    self.drone.move_forward(x=20)
+                elif key=="down":
+                    self.drone.move_back(x=20)
+                elif key=="left":
+                    self.drone.move_left(x=20)    
+                elif key=="right":    
+                    self.drone.move_right(x=20)    
+                elif key == "a":
+                    self.drone.set_speed(20)
+                elif key == "b":
+                    battery = self.drone.get_battery()
+                    print ("Battery level: "+str(battery))
+                
+            except Exception as error:
+                print(error)
+                continue
+         
+    def drone_listener(self,command):
+        print("command received: "+command)
+        # if (command =="2"):
+        #     self.drone.takeoff()
+        # elif (command == "3"  or command == "4"):
+        #     self.drone.land()
+        
+   
+              
+    def start_stream(self):
+        
+        client = Client()
+        client.start()
+        while True:
+            frame = self.drone.get_frame_read().frame
+            frame = cv2.flip(frame,1 )
+            # framergb = cv2.cvtColor(frame,cv2.IMREAD_COLOR)
+            # framergb = cv2.cvtColor(frame)
+            framergb = frame
+            cv2.imshow("Drone video", framergb)
+            _,encoded_frame = cv2.imencode(".jpg",framergb,[int(cv2.IMWRITE_JPEG_QUALITY),30])
+            buffer = pickle.dumps(encoded_frame)            
+            client.send_with_listener(buffer,self.drone_listener)
             
-            
-        except Exception as error:
-            print(error)
-            continue
-        
-        
-        
-
-threadManage = threading.Thread(target=manage)
-threadManage.start()
-        
+            if cv2.waitKey(1) == ord('q'):
+                break 
 
 
-while True:     
-    try:
-        frame = drone.get_frame_read().frame
-        frame = cv2.flip(frame,1 )
-        framergb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        
-        
-        result = hands.process(framergb)
-    
-        if result.multi_hand_landmarks: 
-            x,y,c = framergb.shape
-            landmarks = []
-            for handslms in result.multi_hand_landmarks:
-                for lm in handslms.landmark:
-                    lmx = int (lm.x * x)
-                    lmy = int (lm.y * y)
-                    landmarks.append([lmx, lmy])
-                result.multi_hand_landmarks
-                mp_draw.draw_landmarks(framergb, handslms, mp_hands.HAND_CONNECTIONS)
-                # class_Name = labels[classID].capitalize()
-        
-            prediction = model.predict([landmarks])
-            classID = np.argmax (prediction)        
-            print (classID)
-            if classID == 2: 
-                drone.move_back(40)
-            elif classID == 3:
-                print("THUMB DOWN")
-    
-    
-        
-        cv2.imshow('Video from Tellol',framergb)
-        if cv2.waitKey(5) & 0xFF == ord('q'):
-            drone.streamoff()
-            break
-    except Exception as error:
-        print (error)
-        continue
+controller = HCTrelloController()
+controller.init()
+controller.start_stream()
