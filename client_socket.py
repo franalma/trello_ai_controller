@@ -11,7 +11,8 @@ class Client:
     # HOST = "192.168.2.31"  
     # LOCALHOST = "127.0.0.1"
     # HOST = "127.0.0.1"  
-    PORT_SEND = 65432  
+    PORT_SEND = 65432
+ 
     PORT_RECEIVED = 65431  
     s_out = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) 
     s_out.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 1000000)

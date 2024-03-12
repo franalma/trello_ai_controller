@@ -77,6 +77,9 @@ class HCTrelloController:
     def drone_listener(self,command):
         try:
             print("command received: "+command)
+            if (command == "7" or command =="3" or command =="8"):
+                return
+            
             if (self.prev_command != command):
                 if (command =="2"):
                     if (self.isFying == False):
@@ -84,14 +87,14 @@ class HCTrelloController:
                         self.isFying = True
                 elif (command == "8"):
                     if (self.isFying == True):
-                        self.drone.land()
+                        # self.drone.land()
                         self.isFying = False
-                elif (command == "3"):
+                elif (command == "4"):
                     if (self.isFying):
-                        self.drone.move_back(25)            
+                        self.drone.move_back(50)            
                 elif (command == "5"):
                     if (self.isFying):
-                        self.drone.move_forward(25 ) 
+                        self.drone.move_forward(50) 
                 self.prev_command = command                     
         except:
             return
