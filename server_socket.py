@@ -40,7 +40,7 @@ class Server:
     
         print("Streaming server started...")
         
-        
+        timstamp = 0
         while True:
             buffer, addr = self.s_in.recvfrom(60000)  
             data=pickle.loads(buffer)
@@ -49,9 +49,13 @@ class Server:
                 # if self.calculate_frame_distance(data):
                 if True:
                     result = on_received(data, self.isDisplayEnabled)                    
-                    if result >=0:
+                    if result >=0 and result !="3":
+                        diff_time = time.time() -timstamp
                         print (result)
-                        self.send_to_client_response(addr[0], addr[1], str(result))
+                        print(diff_time)
+                        timstamp = time.time()
+                        if(diff_time >0.5):
+                            self.send_to_client_response(addr[0], addr[1], str(result))
                 
                 
 

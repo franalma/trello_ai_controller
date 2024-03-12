@@ -22,25 +22,21 @@ class VideoCap:
             
             if cv2.waitKey(1) == ord('q'):
                 break
-            
-    # def finish_local(self):
-    #     self.cap.release()
-    #     cv2.destroyAllWindows()
-        
+                    
     def start_stream(self):
         cap = cv2.VideoCapture(0)
         client = Client()
-        client.start()
+        client.start_no_listening()
         while True:
             _, frame = cap.read()            
             frame = cv2.flip(frame,1 )
-            # framergb = cv2.cvtColor(frame,cv2.IMREAD_COLOR)
+            framergb = cv2.cvtColor(frame,cv2.COLOR_RGB2BGR)
             # framergb = cv2.cvtColor(frame)
             framergb = frame
             cv2.imshow("Source", framergb)
             ret,encoded_frame = cv2.imencode(".jpg",framergb,[int(cv2.IMWRITE_JPEG_QUALITY),30])
             buffer = pickle.dumps(encoded_frame)            
-            client.send(buffer)
+            client.send(buffer, 1/2)
             
             if cv2.waitKey(1) == ord('q'):
                 break

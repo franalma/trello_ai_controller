@@ -16,13 +16,25 @@ class HandsDetection:
         self.mp_draw = mp.solutions.drawing_utils
         self.model = load_model("mp_hand_gesture")
     
-    def process_movement(self, land0, land9):
-        try: 
-            print("-----")
-            print(land0)
-            print(land9)
+    def process_movement(self, landmarks,class_id):
+        try:
+            print ("ClassID:"+str(class_id))
+            print ("ClassID_t:"+str(type(class_id)))
+            if  class_id == 3:                 
+                print(landmarks)
+                # print(landmarks[1].landmark)
+                # print(landmarks[2].landmark)
+                # print(landmarks[3].landmark)
+                # print(landmarks[4].landmark)                                            
+            elif class_id == 2: 
+                print(landmarks)               
+                # print(landmarks[1].landmark)
+                # print(landmarks[2].landmark)
+                # print(landmarks[3].landmark)
+                # print(landmarks[4].landmark)                                                                        
             print("*******")
-        except:
+        except Exception as error:
+            print(error)
             return
         
     
@@ -31,7 +43,7 @@ class HandsDetection:
             result = self.hands.process(frame)
             x,y,c = frame.shape
             
-            if result.multi_hand_landmarks: 
+            if result.multi_hand_landmarks:                 
                 landmarks = []
                 for handslms in result.multi_hand_landmarks:
                     for lm in handslms.landmark:
@@ -39,12 +51,11 @@ class HandsDetection:
                         lmy = int (lm.y * y)
                         landmarks.append([lmx, lmy])
                     result.multi_hand_landmarks
-                    # self.mp_draw.draw_landmarks(frame, handslms, self.mp_hands.HAND_CONNECTIONS)
-                    
-                # self.process_movement(landmarks[0], landmarks[9])
+                    self.mp_draw.draw_landmarks(frame, handslms, self.mp_hands.HAND_CONNECTIONS)
+                                
                 prediction = self.model.predict([landmarks])            
                 classID = np.argmax (prediction)
-                print ("class: "+str(classID))
+                            
                 return [frame, classID]
 
         except:

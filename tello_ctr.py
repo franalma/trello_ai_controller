@@ -48,13 +48,16 @@ class HCTrelloController:
                 
                 if key=="t":
                     self.drone.takeoff()
+                    self.isFying = True
                 elif key=="l":
                     self.drone.land()
+                    self.isFying = False
                 elif key=="e":
                     self.drone.emergency()
-                elif key=="-":
+                    self.isFying = False
+                elif key=="d":
                     self.drone.move_down(x=20)    
-                elif key=="+":
+                elif key=="u":
                     self.drone.move_up(x=20)
                 elif key=="up":
                     self.drone.move_forward(x=20)
@@ -77,51 +80,56 @@ class HCTrelloController:
     def drone_listener(self,command):
         try:
             print("command received: "+command)
-            if (command == "7" or command =="3" or command =="8"):
-                return
-            
-            if (self.prev_command != command):
+                        
+            # if (self.prev_command != command):
+            if True:
                 if (command =="2"):
                     if (self.isFying == False):
                         self.drone.takeoff()
                         self.isFying = True
                 elif (command == "8"):
                     if (self.isFying == True):
-                        # self.drone.land()
+                        self.drone.land()
                         self.isFying = False
                 elif (command == "4"):
                     if (self.isFying):
-                        self.drone.move_back(50)            
-                elif (command == "5"):
+                        self.drone.move_back(20)            
+                elif (command == "5" or command =="7"):
                     if (self.isFying):
-                        self.drone.move_forward(50) 
-                self.prev_command = command                     
-        except:
+                        self.drone.move_forward(20) 
+                elif (command == "12"):
+                    if (self.isFying):
+                        self.drone.rotate_clockwise(45)
+                                    
+        except Exception as error:
+            print(error)
             return
    
-              
+    def get_frame(self):
+       frame = self.drone.get_frame_read().frame
+       return frame
+       
     def start_stream(self):
         
         client = Client()
-        client.start()
+        client.start_listening()
         while True:
             try:
                 frame = self.drone.get_frame_read().frame
                 frame = cv2.flip(frame,1 )
-                # framergb = cv2.cvtColor(frame,cv2.IMREAD_COLOR)
+                framergb = cv2.cvtColor(frame,cv2.COLOR_RGB2BGR)
                 # framergb = cv2.cvtColor(frame)
                 framergb = frame
                 cv2.imshow("Drone video", framergb)
                 _,encoded_frame = cv2.imencode(".jpg",framergb,[int(cv2.IMWRITE_JPEG_QUALITY),30])
                 buffer = pickle.dumps(encoded_frame)            
                 client.send_with_listener(buffer,self.drone_listener)
-                e
                 if cv2.waitKey(1) == ord('q'):
                     break 
             except:
                 continue
 
 
-controller = HCTrelloController()
-controller.init()
-controller.start_stream()
+# controller = HCTrelloController()
+# controller.init()
+# controller.start_stream()
