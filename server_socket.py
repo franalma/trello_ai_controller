@@ -6,7 +6,8 @@ import pickle,struct
 
 class Server:
     # HOST = "192.168.2.31" 
-    HOST = "0.0.0.0"
+    # HOST = "0.0.0.0"
+    HOST = "127.0.0.1"
     PORT = 65432  
     PORT_CLIENT = 65431
     s_in = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

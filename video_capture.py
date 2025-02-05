@@ -43,5 +43,5 @@ class VideoCap:
         
     
 
-# VideoCap().start_local()
-VideoCap().start_stream()
+VideoCap().start_local()
+# VideoCap().start_stream()
