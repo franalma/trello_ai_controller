@@ -2,7 +2,7 @@
 import numpy as np
 import mediapipe as mp
 from keras.models import load_model
-from server_socket import Server
+from src.server_socket import Server
 
 class HandsDetection:
     mp_hands = mp.solutions.hands

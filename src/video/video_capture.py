@@ -5,7 +5,7 @@ class VideoCap:
    
     
     def start_local(self):        
-        from hands_detection_model import HandsDetection
+        from src.models.hands_detection_model import HandsDetection
         hands_detection = HandsDetection()    
         hands_detection.load_model()
         cap = cv2.VideoCapture(0)

@@ -1,7 +1,7 @@
 
 
 import cv2, pickle, struct
-from tracking_model import TrackingModel
+from src.models.tracking_model import TrackingModel
 
 
 tracking = TrackingModel()

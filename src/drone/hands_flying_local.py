@@ -1,5 +1,5 @@
-from hands_detection_model import HandsDetection
-from tello_ctr import HCTrelloController
+from src.models.hands_detection_model import HandsDetection
+from src.drone.tello_ctr import HCTrelloController
 import cv2
 import time
 

@@ -1,5 +1,5 @@
-from server_socket import Server
-from hands_detection_model import HandsDetection
+from src.server_socket import Server
+from src.models.hands_detection_model import HandsDetection
 import cv2
 import time
 

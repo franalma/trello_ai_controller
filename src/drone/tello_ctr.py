@@ -3,21 +3,27 @@ import cv2, pickle
 import time
 import threading
 import keyboard
-import numpy as np
-from client_socket import Client
+from client.client_socket import Client
+import socket
+import time
 
 
 class HCTrelloController:
-    isFying = False
-    drone = tello.Tello()
+    isFying = False    
     prev_command = ""
+    
 
-    def init(self):
+    def init(self, isForWeb):
+        print("Init")
+        self.drone = tello.Tello()
         self.drone.connect()
         self.drone.streamoff()
         self.drone.streamon()
-        threadManage = threading.Thread(target=self.manage)
-        threadManage.start()
+        
+        if isForWeb == False:
+            threadManage = threading.Thread(target=self.manage)
+            threadManage.start()
+        
 
     def fly_test(self):
         print("Ready to fly")
@@ -76,6 +82,40 @@ class HCTrelloController:
             except Exception as error:
                 print(error)
                 continue
+
+    def manage_with_web_command(self, key):
+        try:
+             
+            if key=="t":
+                self.drone.takeoff()
+                self.isFying = True
+            elif key=="l":
+                self.drone.land()
+                self.isFying = False
+            elif key=="e":
+                self.drone.emergency()
+                self.isFying = False
+            elif key=="d":
+                self.drone.move_down(x=20)    
+            elif key=="u":
+                self.drone.move_up(x=20)
+            elif key=="up":
+                self.drone.move_forward(x=20)
+            elif key=="down":
+                self.drone.move_back(x=20)
+            elif key=="left":
+                self.drone.move_left(x=20)    
+            elif key=="right":    
+                self.drone.move_right(x=20)    
+            elif key == "a":
+                self.drone.set_speed(20)
+            elif key == "b":
+                battery = self.drone.get_battery()
+                print ("Battery level: "+str(battery))
+        
+        except Exception as error:
+            print(error)
+                
          
     def drone_listener(self,command):
         try:
@@ -129,6 +169,35 @@ class HCTrelloController:
             except:
                 continue
 
+
+    
+
+    def connect_ap(self):
+        # TELLO_IP = '192.168.10.1'
+        # TELLO_PORT = 8889
+
+        WIFI_SSID = 'TelloAp24'
+        WIFI_PASS = 'Aa123456'
+        
+
+        # sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # sock.bind(('', 9000))  # optional
+               
+        
+        # sock.sendto("command".encode(), (TELLO_IP, TELLO_PORT))
+        # time.sleep(2)        
+        # sock.sendto(f'setap {WIFI_SSID} {WIFI_PASS}'.encode(), (TELLO_IP, TELLO_PORT))
+        # time.sleep(2)
+        state = self.drone.get_current_state()
+        print(state)
+        res = self.drone.send_control_command("command", 2)
+        print(res)
+        self.drone.connect_to_wifi(WIFI_SSID, WIFI_PASS)
+       
+
+        
+        
+        
 
 # controller = HCTrelloController()
 # controller.init()

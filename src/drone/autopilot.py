@@ -1,6 +1,6 @@
 import cv2
-from tracking_model import TrackingModel
-from tello_ctr import HCTrelloController
+from src.models.tracking_model import TrackingModel
+from src.drone.tello_ctr import HCTrelloController
 import time
 
 class DroneAutoPilot:
