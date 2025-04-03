@@ -84,6 +84,7 @@ class HCTrelloController:
                 continue
 
     def manage_with_web_command(self, key):
+        print(f"manage_with_web_command: {key}")
         try:
              
             if key=="t":
