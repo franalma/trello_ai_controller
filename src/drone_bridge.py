@@ -6,6 +6,7 @@ import time
 import socket
 import struct
 import pickle
+from models.hands_detection_model import HandsDetection
 
 
 class DroneBridge:
@@ -13,19 +14,20 @@ class DroneBridge:
     port_commands = 3500
     video_on = False
     drone_controller = HCTrelloController()
+    hands_model = HandsDetection()
 
     def start_command_server(self):
         self.socket_server = WebSocketServer()
-        self.socket_server.init("127.0.0.1", self.port_commands)
+        self.socket_server.init("0.0.0.0", self.port_commands)
         self.socket_server.start(self.onReceiveCommand)
 
 
     def start_video_server_local_camera(self):
         # Setup socket server
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_socket.bind(('127.0.0.1', self.port_video))
+        server_socket.bind(('0.0.0.0', self.port_video))
         server_socket.listen(1)
-        print("Waiting for connection...")
+        print(f"Waiting for connection, port {self.port_video}")
         conn, addr = server_socket.accept()
         print("Connected to:", addr)
 
@@ -44,6 +46,24 @@ class DroneBridge:
        
 
 
+    def start_video_drone(self):
+        # Setup socket server
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server_socket.bind(('0.0.0.0', self.port_video))
+        server_socket.listen(1)
+        print(f"Waiting for connection, port {self.port_video}")
+        conn, addr = server_socket.accept()
+        print("Connected to:", addr)
+       
+        while True:
+            frame = self.drone_controller.get_frame()
+
+            frame_p, class_id = self.hands_model.process(frame)
+            # Serialize frame
+            data = pickle.dumps(frame_p)
+            size = struct.pack("Q", len(data))  # 8-byte header
+            conn.sendall(size + data)
+
 
 
 
@@ -53,10 +73,15 @@ class DroneBridge:
         thread_commands = threading.Thread(target=self.start_command_server)        
         thread_commands.start()
 
-        thread_video = threading.Thread(target=self.start_video_server_local_camera)        
+        # thread_video = threading.Thread(target=self.start_video_server_local_camera)        
+        # thread_video.start()
+
+        self.hands_model.load_model()
+        thread_video = threading.Thread(target=self.start_video_drone)        
         thread_video.start()
 
         self.drone_controller.init(True)
+
 
         
         

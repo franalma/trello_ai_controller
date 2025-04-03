@@ -2,7 +2,7 @@
 import numpy as np
 import mediapipe as mp
 from keras.models import load_model
-from src.server_socket import Server
+
 
 class HandsDetection:
     mp_hands = mp.solutions.hands
@@ -14,7 +14,7 @@ class HandsDetection:
     def load_model(self):    
         self.hands = self.mp_hands.Hands(static_image_mode = False, max_num_hands =1, min_detection_confidence = 0.7)
         self.mp_draw = mp.solutions.drawing_utils
-        self.model = load_model("mp_hand_gesture")
+        self.model = load_model("/Users/fran/Desktop/Projects/Huawei/trello_ai_controller/src/models/mp_hand_gesture")
     
     def process_movement(self, landmarks,class_id):
         try:
