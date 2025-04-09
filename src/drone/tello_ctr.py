@@ -52,22 +52,22 @@ class HCTrelloController:
                 key = keyboard.read_key()
                 print("key: "+key)
                 
-                if key=="t":
+                if key=="takeoff":
                     self.drone.takeoff()
                     self.isFying = True
-                elif key=="l":
+                elif key=="land":
                     self.drone.land()
                     self.isFying = False
-                elif key=="e":
+                elif key=="emergency":
                     self.drone.emergency()
                     self.isFying = False
-                elif key=="d":
-                    self.drone.move_down(x=20)    
-                elif key=="u":
-                    self.drone.move_up(x=20)
-                elif key=="up":
-                    self.drone.move_forward(x=20)
                 elif key=="down":
+                    self.drone.move_down(x=20)    
+                elif key=="up":
+                    self.drone.move_up(x=20)
+                elif key=="forward":
+                    self.drone.move_forward(x=20)                    
+                elif key=="back":
                     self.drone.move_back(x=20)
                 elif key=="left":
                     self.drone.move_left(x=20)    
@@ -87,27 +87,27 @@ class HCTrelloController:
         print(f"manage_with_web_command: {key}")
         try:
              
-            if key=="t":
+            if key=="takeoff":
                 self.drone.takeoff()
                 self.isFying = True
-            elif key=="l":
+            elif key=="landl":
                 self.drone.land()
                 self.isFying = False
-            elif key=="e":
+            elif key=="emergency":
                 self.drone.emergency()
                 self.isFying = False
-            elif key=="d":
-                self.drone.move_down(x=20)    
-            elif key=="u":
-                self.drone.move_up(x=20)
-            elif key=="up":
-                self.drone.move_forward(x=20)
             elif key=="down":
-                self.drone.move_back(x=20)
+                self.drone.move_down(x=50)    
+            elif key=="up":
+                self.drone.move_up(x=50)
+            elif key=="forward":
+                self.drone.move_forward(x=50)
+            elif key=="back":
+                self.drone.move_back(x=50)
             elif key=="left":
-                self.drone.move_left(x=20)    
+                self.drone.move_left(x=50)    
             elif key=="right":    
-                self.drone.move_right(x=20)    
+                self.drone.move_right(x=50)    
             elif key == "a":
                 self.drone.set_speed(20)
             elif key == "b":

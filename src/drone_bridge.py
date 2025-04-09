@@ -15,17 +15,19 @@ class DroneBridge:
     video_on = False
     drone_controller = HCTrelloController()
     hands_model = HandsDetection()
+    server_video = "127.0.0.1"
+    server_commands = "127.0.0.1"
 
     def start_command_server(self):
         self.socket_server = WebSocketServer()
-        self.socket_server.init("0.0.0.0", self.port_commands)
+        self.socket_server.init(self.server_commands, self.port_commands)
         self.socket_server.start(self.onReceiveCommand)
 
 
     def start_video_server_local_camera(self):
         # Setup socket server
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_socket.bind(('0.0.0.0', self.port_video))
+        server_socket.bind((self.server_video, self.port_video))
         server_socket.listen(1)
         print(f"Waiting for connection, port {self.port_video}")
         conn, addr = server_socket.accept()
@@ -49,20 +51,24 @@ class DroneBridge:
     def start_video_drone(self):
         # Setup socket server
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_socket.bind(('0.0.0.0', self.port_video))
+        server_socket.bind((self.server_video, self.port_video))
         server_socket.listen(1)
         print(f"Waiting for connection, port {self.port_video}")
         conn, addr = server_socket.accept()
         print("Connected to:", addr)
        
         while True:
-            frame = self.drone_controller.get_frame()
-
-            frame_p, class_id = self.hands_model.process(frame)
-            # Serialize frame
-            data = pickle.dumps(frame_p)
-            size = struct.pack("Q", len(data))  # 8-byte header
-            conn.sendall(size + data)
+            try:
+                frame = self.drone_controller.get_frame()
+                data = pickle.dumps(frame)
+                # frame_p, class_id = self.hands_model.process(frame)
+                # Serialize frame
+                # data = pickle.dumps(frame_p)
+                size = struct.pack("Q", len(data))  # 8-byte header
+                conn.sendall(size + data)
+            except Exception as e: 
+                continue
+                
 
 
 
@@ -122,12 +128,7 @@ class DroneBridge:
             
 
         
-            
-        
-        
     
-
-        
 bridge = DroneBridge()
 bridge.init() 
         

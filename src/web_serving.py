@@ -13,6 +13,7 @@ import socket
 app = Flask(__name__)
 data = b""
 payload_size = struct.calcsize("Q")
+server = "127.0.0.1"
 
 
 def video_callback(input):
@@ -24,7 +25,7 @@ def video_callback(input):
      
 # # Set up socket to receive frames
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client_socket.connect(('127.0.0.1', 3000))  
+client_socket.connect((server, 3000))  
 
 def receive_frames():
     global data
@@ -61,11 +62,11 @@ def receive_frames():
 
 
 socket_commands = WebSocketClient()
-socket_commands.connect("00001", "127.0.0.1", 3500)
+socket_commands.connect("00001",server, 3500)
 
 def video_server_task():
     socket_video = WebSocketServer()
-    socket_video.init("127.0.0.1", 3000)
+    socket_video.init(server, 3000)
     socket_video.start(video_callback)
 
 
